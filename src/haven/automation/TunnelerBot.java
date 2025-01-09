@@ -8,12 +8,14 @@ import haven.FlowerMenu;
 import haven.GameUI;
 import haven.Gob;
 import haven.Label;
+import haven.Loading;
 import haven.MCache;
 import haven.RichText;
 import haven.UI;
 import haven.Widget;
 import haven.Window;
 import haven.automation.helpers.TileStatic;
+import haven.purus.pbot.PBotGob;
 import haven.purus.pbot.PBotGobAPI;
 import haven.purus.pbot.PBotItem;
 import haven.purus.pbot.PBotUtils;
@@ -394,7 +396,7 @@ public class TunnelerBot extends Window implements Runnable {
                 gui.map.wdgmsg("click", Coord.z, closeConstr.rc.floor(posres), 3, 0, 0, (int) closeConstr.id, closeConstr.rc.floor(posres), 0, -1);
                 sleep(1000);
 
-                // Check if window interrupted
+                // Check if window was interrupted
                 int attempts = 0;
                 while (!AUtils.hasWnd("Stone Column", gui) && attempts < 5) {
                     sleep(3000);
@@ -409,7 +411,9 @@ public class TunnelerBot extends Window implements Runnable {
             pfL(columnCoord);
             AUtils.clickUiButton("paginae/bld/column", gui);
             sleep(300);
-            Coord2d buildPos = columnCoord.add(columnOffset).floord(MCache.tilesz).mul(MCache.tilesz).add(MCache.tilesz.div(2));
+            Coord2d buildPos = new Coord2d(columnCoord.add(columnOffset).x, columnCoord.add(columnOffset).y)
+                    .sub(columnCoord.add(columnOffset).x % MCache.tilesz.x, columnCoord.add(columnOffset).y % MCache.tilesz.y)
+                    .add(MCache.tilesz.x / 2, MCache.tilesz.y / 2).sub(MCache.tilesz);
             gui.map.wdgmsg("place", buildPos.floor(posres), 0, 1, 0);
             sleep(1000);
             AUtils.activateSign("Stone Column", gui);
@@ -621,7 +625,7 @@ public class TunnelerBot extends Window implements Runnable {
         debug("tilesToMine " + tilesToMine);
         if (tilesToMine > 0) {
             AUtils.clickUiButton("paginae/act/mine", gui);
-            if (!((PBotGobAPI.player(ui).getPoses().contains("gfx/borka/pickan") || PBotGobAPI.player(ui).getPoses().contains("gfx/borka/choppan")) || PBotGobAPI.player(ui).getPoses().contains("gfx/borka/drinkan"))) {
+            if (!((PBotGobAPI.player(ui).getPoses().contains("pickan") || PBotGobAPI.player(ui).getPoses().contains("choppan")) || PBotGobAPI.player(ui).getPoses().contains("drinkan"))) {
                 gui.map.wdgmsg("sel", place.floor(MCache.tilesz), place.add(end).floor(MCache.tilesz), 0);
             }
             sleep(4000);
@@ -756,6 +760,7 @@ public class TunnelerBot extends Window implements Runnable {
     private void debug(String str) {
         gui.debuglog.append(str, Color.WHITE);
     }
+
 
     private void pfL(Coord2d c) throws InterruptedException {
         FlowerMenu.setNextSelection();
